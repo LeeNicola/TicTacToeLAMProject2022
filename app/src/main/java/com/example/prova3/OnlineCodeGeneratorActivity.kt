@@ -10,6 +10,9 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.ktx.database
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 
 var isCodeMaker = true
 var code = "null"
@@ -22,6 +25,7 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
     lateinit var createCodeBtn : Button
     lateinit var joinCodeBtn : Button
     lateinit var loadingPB : ProgressBar
+    val db = Firebase.firestore
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +38,25 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
         loadingPB = findViewById(R.id.idPBLoading)
 
         createCodeBtn.setOnClickListener(){
-            code = "null"
+            //val database = FirebaseDatabase.getInstance()
+            //val myRef = database.getReference("prova-d2515-default-rtdb")
+            //myRef.setValue("Hello, World!")
+            Toast.makeText(this, "PROVA BIGNO", Toast.LENGTH_LONG).show()
+            var dbRef = FirebaseDatabase.getInstance().getReference("Employees")
+
+            dbRef.child("empId").setValue("employee")
+
+                .addOnCompleteListener {
+
+                    Toast.makeText(this, "Data inserted successfully", Toast.LENGTH_LONG).show()
+
+                }.addOnFailureListener { err ->
+
+                    Toast.makeText(this, "Error ${err.message}", Toast.LENGTH_LONG).show()
+
+                }
+            Toast.makeText(this, "MANNAGGIA", Toast.LENGTH_LONG).show()
+            /*code = "null"
             codeFound = false
             checkTemp = true
             keyValue = "null"
@@ -69,7 +91,7 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        TODO("Not yet implemented")
+                        //do nothing
                     }
                 })
             } else {
@@ -79,7 +101,7 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
                 codeEdt.visibility = View.VISIBLE
                 loadingPB.visibility = View.GONE
                 Toast.makeText(this,"Please enter a valid code",Toast.LENGTH_SHORT).show()
-            }
+            }*/
         }
 
         joinCodeBtn.setOnClickListener(){
@@ -119,7 +141,7 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        TODO("Not yet implemented")
+                        //
                     }
                 })
 

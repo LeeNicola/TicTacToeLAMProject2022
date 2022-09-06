@@ -96,8 +96,7 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
     fun moveOnline(data : String, move : Boolean){
         val audio = MediaPlayer.create(this, R.raw.click_sound)
         if(move){
-            var buttonSelected : Button?
-            buttonSelected = when(data.toInt()){
+            var buttonSelected : Button? = when(data.toInt()){
                 1->box1Btn
                 2->box2Btn
                 3->box3Btn
@@ -111,14 +110,14 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
                     box1Btn
                 }
             }
-            buttonSelected.text = "0"
+            buttonSelected?.text = "0"
             turnTV.text = "Turn : Player 1"
-            buttonSelected.setTextColor(Color.parseColor("#EC0C0C"))
+            buttonSelected?.setTextColor(Color.parseColor("#EC0C0C"))
             player2.add(data.toInt())
             emptyCells.add(data.toInt())
             audio.start()
             Handler().postDelayed(Runnable {audio.release()},200)
-            buttonSelected.isEnabled = false
+            buttonSelected?.isEnabled = false
             checkWinner()
         }
     }
@@ -217,7 +216,7 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
         audio.start()
         buttonSelected.isEnabled = false
         Handler().postDelayed(Runnable { audio.release() }, 200)
-        val checkWinner = checkWinner()
+        checkWinner()
 
     }
 
@@ -226,9 +225,14 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
         player2.clear()
         emptyCells.clear()
         activeUser = 1
+        player1TV.text = "Player 1 : $player1count"
+        player2TV.text = "Player 2 : $player2count"
+        isMyMove = isCodeMaker
+        if(isCodeMaker){
+            FirebaseDatabase.getInstance().reference.child("data").child(code).removeValue()
+        }
         for(i in 1..9){
-            var buttonSelected : Button?
-            buttonSelected = when(i) {
+            var buttonSelected : Button? = when(i) {
                 1->box1Btn
                 2->box2Btn
                 3->box3Btn
@@ -242,14 +246,8 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
                     box1Btn
                 }
             }
-            buttonSelected.isEnabled = true
-            buttonSelected.text = ""
-            player1TV.text = "Player 1 : $player1count"
-            player2TV.text = "Player 2 : $player2count"
-            isMyMove = isCodeMaker
-            if(isCodeMaker){
-                FirebaseDatabase.getInstance().reference.child("data").child(code).removeValue()
-            }
+            buttonSelected?.isEnabled = true
+            buttonSelected?.text = ""
         }
     }
 
