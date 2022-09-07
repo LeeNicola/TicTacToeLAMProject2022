@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">prova3</string>
+    <string name="player1">Giocatore 1</string>
+    <string name="player2">Giocatore 2</string>
+    <string name="back">Indietro</string>
+    <string name="exit">Esci</string>
+    <string name="startGame">Gioca</string>
+    <string name="login">Accedi</string>
+    <string name="rules">Regole</string>
+    <string name="wins">Vittorie:</string>
+    <string name="welcome">Eccoti,</string>
+    <string name="credits">Riconoscimenti</string>
+    <string name="logout">Disconnettiti</string>
+    <string name="register">Registrati</string>
+</resources>

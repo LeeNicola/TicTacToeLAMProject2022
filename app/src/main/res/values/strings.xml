@@ -1,3 +1,20 @@
 <resources>
     <string name="app_name">prova3</string>
+    <string name="player1">Player 1</string>
+    <string name="player2">Player 2</string>
+    <string name="reset" translatable="false">Reset</string>
+    <string name="back">Back</string>
+    <string name="exit">Exit</string>
+    <string name="startGame">Start Game</string>
+    <string name="login">Login</string>
+    <string name="rules">Rules</string>
+    <string name="wins">Wins:</string>
+    <string name="welcome">Here you are,</string>
+    <string name="credits">Credits</string>
+    <string name="logout">Logout</string>
+    <string name="title" translatable="false">Tic Tac Toe</string>
+    <string name="email" translatable="false">Email</string>
+    <string name="password" translatable="false">Password</string>
+    <string name="register">Register</string>
+    <string name="username" translatable="false">Username</string>
 </resources>

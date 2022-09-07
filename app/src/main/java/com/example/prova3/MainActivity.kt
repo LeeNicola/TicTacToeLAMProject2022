@@ -14,8 +14,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        singlePlayerBtn = findViewById(R.id.idBtnSinglePlayer)
-        multiPlayerBtn = findViewById(R.id.idBtnMultiPlayer)
+        singlePlayerBtn = findViewById(R.id.singlePlayerBtn)
+        multiPlayerBtn = findViewById(R.id.multiPlayerBtn)
         singlePlayerBtn.setOnClickListener(){
             singleUser = true
             startActivity(Intent(this,GamePlayActivity::class.java))
