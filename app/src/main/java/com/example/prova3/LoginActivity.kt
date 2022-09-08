@@ -10,6 +10,10 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuth.AuthStateListener
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+
 
 class LoginActivity : AppCompatActivity() {
 
@@ -18,6 +22,16 @@ class LoginActivity : AppCompatActivity() {
     private var password:EditText? = null
     private var login: Button? = null
     private var progressBar: ProgressBar? = null
+    private var firebaseAuth = Firebase.auth
+
+    val authStateListener = AuthStateListener { firebaseAuth ->
+        val firebaseUser = firebaseAuth.currentUser
+        if (firebaseUser != null) {
+            val intent = Intent(this@LoginActivity, MainMenu::class.java)
+            startActivity(intent)
+            finish()
+        }
+    }
 
     private lateinit var mAuth: FirebaseAuth
 
@@ -41,8 +55,20 @@ class LoginActivity : AppCompatActivity() {
         login?.setOnClickListener {
             userLogin()
         }
+
+
+
     }
 
+    override fun onStart() {
+        super.onStart()
+        firebaseAuth.addAuthStateListener(authStateListener)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        firebaseAuth.removeAuthStateListener(authStateListener)
+    }
 
 
     private fun userLogin() {
@@ -69,7 +95,7 @@ class LoginActivity : AppCompatActivity() {
             return
         }
         progressBar!!.visibility = View.VISIBLE
-        mAuth!!.signInWithEmailAndPassword(emailString, passwordString)
+        mAuth.signInWithEmailAndPassword(emailString, passwordString)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(this@LoginActivity, "Success", Toast.LENGTH_SHORT).show()

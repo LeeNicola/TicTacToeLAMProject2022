@@ -1,4 +1,4 @@
 package com.example.prova3
 
-class User(var email: String, var username: String) {
+class User(var email: String? = null, var username: String? = null) {
 }
