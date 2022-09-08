@@ -16,10 +16,10 @@ class LoginActivity : AppCompatActivity() {
     private var register: Button? = null
     private var email: EditText? = null
     private var password:EditText? = null
-    private var signIn: Button? = null
-    private var  progressBar: ProgressBar? = null
+    private var login: Button? = null
+    private var progressBar: ProgressBar? = null
 
-    private var mAuth: FirebaseAuth? = null
+    private lateinit var mAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,27 +27,27 @@ class LoginActivity : AppCompatActivity() {
 
         mAuth = FirebaseAuth.getInstance()
 
-        signIn = findViewById<View>(R.id.login) as Button
+        login = findViewById(R.id.login)
 
-        email = findViewById<View>(R.id.email) as EditText
-        password = findViewById<View>(R.id.password) as EditText
-        progressBar = findViewById<View>(R.id.progressBar) as ProgressBar
+        email = findViewById(R.id.email)
+        password = findViewById(R.id.password)
+        progressBar = findViewById(R.id.progressBar)
 
+        register = findViewById(R.id.register)
+        register?.setOnClickListener {
+                registrationPage()
+        }
 
-        //progressBar = (progressBar) findViewById(R.id.progressBar);
-        register = findViewById<View>(R.id.register) as Button
-        register?.setOnClickListener(View.OnClickListener { view ->
-            when (view.id) {
-                R.id.register -> registrationPage()
-                R.id.login -> userLogin()
-            }
-        })
-
+        login?.setOnClickListener {
+            userLogin()
+        }
     }
 
+
+
     private fun userLogin() {
-        val emailString = email!!.text.toString().trim { it <= ' ' }
-        val passwordString = password!!.text.toString().trim { it <= ' ' }
+        val emailString = email!!.text.toString()
+        val passwordString = password!!.text.toString()
         if (emailString.isEmpty()) {
             email!!.error = "Email required"
             email!!.requestFocus()
@@ -69,10 +69,11 @@ class LoginActivity : AppCompatActivity() {
             return
         }
         progressBar!!.visibility = View.VISIBLE
-        mAuth!!.createUserWithEmailAndPassword(emailString, passwordString)
+        mAuth!!.signInWithEmailAndPassword(emailString, passwordString)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    startActivity(Intent(this@LoginActivity, MainMenu::class.java))
+                    Toast.makeText(this@LoginActivity, "Success", Toast.LENGTH_SHORT).show()
+                    mainMenuPage()
                 } else {
                     Toast.makeText(this@LoginActivity, "Failed to login", Toast.LENGTH_SHORT).show()
                     progressBar!!.visibility = View.GONE
@@ -80,8 +81,13 @@ class LoginActivity : AppCompatActivity() {
             }
     }
 
-    fun registrationPage() {
+    private fun registrationPage() {
         val toRegistration = Intent(this, RegistrationActivity::class.java)
         startActivity(toRegistration)
+    }
+
+    private fun mainMenuPage(){
+        val toMainMenu = Intent(this, MainMenu::class.java)
+        startActivity(toMainMenu)
     }
 }

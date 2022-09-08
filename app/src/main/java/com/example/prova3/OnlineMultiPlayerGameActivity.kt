@@ -5,6 +5,7 @@ import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -116,7 +117,7 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
             player2.add(data.toInt())
             emptyCells.add(data.toInt())
             audio.start()
-            Handler().postDelayed(Runnable {audio.release()},200)
+            Handler(Looper.getMainLooper()).postDelayed(Runnable {audio.release()},200)
             buttonSelected?.isEnabled = false
             checkWinner()
         }
@@ -137,20 +138,20 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
             buttonDisable()
             audio.start()
             disableReset()
-            Handler().postDelayed(Runnable { audio.release() }, 4000)
+            Handler(Looper.getMainLooper()).postDelayed(Runnable { audio.release() }, 4000)
             val build = AlertDialog.Builder(this)
             build.setTitle("Game Over")
             build.setMessage("Player 1 Wins \n\n" + "Do you want to play again?")
-            build.setPositiveButton("ok"){ dialog, which->
+            build.setPositiveButton("ok"){ _,_->
                 reset()
                 audio.release()
             }
-            build.setNegativeButton("Exit"){ dialog, which->
+            build.setNegativeButton("Exit"){ _,_->
                 audio.release()
                 removeCode()
                 exitProcess(1)
             }
-            Handler().postDelayed(Runnable { build.show() }, 2000)
+            Handler(Looper.getMainLooper()).postDelayed(Runnable { build.show() }, 2000)
             return 1
 
         } else if((player2.contains(1) && player2.contains(2) && player2.contains(3)) ||
@@ -165,40 +166,40 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
             buttonDisable()
             audio.start()
             disableReset()
-            Handler().postDelayed(Runnable { audio.release() }, 4000)
+            Handler(Looper.getMainLooper()).postDelayed(Runnable { audio.release() }, 4000)
             val build = AlertDialog.Builder(this)
             build.setTitle("Game Over")
             build.setMessage("Player 2 Wins \n\n" + "Do you want to play again?")
-            build.setPositiveButton("ok"){ dialog, which->
+            build.setPositiveButton("ok"){ _,_->
                 reset()
                 audio.release()
             }
-            build.setNegativeButton("Exit"){ dialog, which->
+            build.setNegativeButton("Exit"){ _,_->
                 audio.release()
                 removeCode()
                 exitProcess(1)
             }
-            Handler().postDelayed(Runnable { build.show() }, 2000)
+            Handler(Looper.getMainLooper()).postDelayed(Runnable { build.show() }, 2000)
             return 1
 
         } else if(emptyCells.contains(1) && emptyCells.contains(2) && emptyCells.contains(3) &&
             emptyCells.contains(4) && emptyCells.contains(5) && emptyCells.contains(6) &&
             emptyCells.contains(7) && emptyCells.contains(8) && emptyCells.contains(9)){
             draw_audio.start()
-            Handler().postDelayed(Runnable { draw_audio.release() }, 4000)
+            Handler(Looper.getMainLooper()).postDelayed(Runnable { draw_audio.release() }, 4000)
             val build = AlertDialog.Builder(this)
             build.setTitle("Game Over")
             build.setMessage("Game Draw \n\n" + "Do you want to play again?")
-            build.setPositiveButton("ok"){ dialog, which->
+            build.setPositiveButton("ok"){ _,_->
                 reset()
                 draw_audio.release()
             }
-            build.setNegativeButton("Exit"){ dialog, which->
+            build.setNegativeButton("Exit"){ _,_->
                 draw_audio.release()
                 removeCode()
                 exitProcess(1)
             }
-            Handler().postDelayed(Runnable { build.show() }, 2000)
+            Handler(Looper.getMainLooper()).postDelayed(Runnable { build.show() }, 2000)
             return 1
         }
         return 0
@@ -215,7 +216,7 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
         emptyCells.add(currCell)
         audio.start()
         buttonSelected.isEnabled = false
-        Handler().postDelayed(Runnable { audio.release() }, 200)
+        Handler(Looper.getMainLooper()).postDelayed(Runnable { audio.release() }, 200)
         checkWinner()
 
     }
@@ -282,7 +283,7 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
 
     fun disableReset() {
         resetBtn.isEnabled = false
-        Handler().postDelayed(Runnable { resetBtn.isEnabled = true }, 2200)
+        Handler(Looper.getMainLooper()).postDelayed(Runnable { resetBtn.isEnabled = true }, 2200)
     }
 
     fun updateDatabase(cellID : Int){
@@ -300,23 +301,22 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
     fun buttonClick(view: View) {
         if(isMyMove){
             val but = view as Button
-            var cellOnline = 0
-            when (but.id) {
-                R.id.idBtnBox1 -> cellOnline = 1
-                R.id.idBtnBox2 -> cellOnline = 2
-                R.id.idBtnBox3 -> cellOnline = 3
-                R.id.idBtnBox4 -> cellOnline = 4
-                R.id.idBtnBox5 -> cellOnline = 5
-                R.id.idBtnBox6 -> cellOnline = 6
-                R.id.idBtnBox7 -> cellOnline = 7
-                R.id.idBtnBox8 -> cellOnline = 8
-                R.id.idBtnBox9 -> cellOnline = 9
+            var cellOnline: Int  = when (but.id) {
+                R.id.idBtnBox1 -> 1
+                R.id.idBtnBox2 -> 2
+                R.id.idBtnBox3 -> 3
+                R.id.idBtnBox4 -> 4
+                R.id.idBtnBox5 -> 5
+                R.id.idBtnBox6 -> 6
+                R.id.idBtnBox7 -> 7
+                R.id.idBtnBox8 -> 8
+                R.id.idBtnBox9 -> 9
                 else -> {
-                    cellOnline = 0
+                    0
                 }
             }
             playerTurn = false
-            Handler().postDelayed(Runnable { playerTurn = true }, 600)
+            Handler(Looper.getMainLooper()).postDelayed(Runnable { playerTurn = true }, 600)
             playNow(but, cellOnline)
             updateDatabase(cellOnline)
         }

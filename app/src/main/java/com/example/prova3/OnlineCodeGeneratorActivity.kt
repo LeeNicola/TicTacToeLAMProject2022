@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.View
 import android.widget.*
 import com.google.firebase.database.DataSnapshot
@@ -69,7 +70,7 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
                 FirebaseDatabase.getInstance().reference.child("codes").addValueEventListener(object : ValueEventListener{
                     override fun onDataChange(snapshot: DataSnapshot) {
                         var check = isValueAvailable(snapshot, code)
-                        Handler().postDelayed({
+                        Handler(Looper.getMainLooper()).postDelayed({
                             if (check==true){
                                 createCodeBtn.visibility = View.VISIBLE
                                 joinCodeBtn.visibility = View.VISIBLE
@@ -80,7 +81,7 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
                                 FirebaseDatabase.getInstance().reference.child("codes").push().setValue(code)
                                 isValueAvailable(snapshot, code)
                                 checkTemp = false
-                                Handler().postDelayed({
+                                Handler(Looper.getMainLooper()).postDelayed({
                                     accepted()
                                     Toast.makeText(this@OnlineCodeGeneratorActivity, "Please don't go back",Toast.LENGTH_SHORT).show()
                                 },300)
@@ -118,7 +119,7 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
                 FirebaseDatabase.getInstance().reference.child("codes").addValueEventListener(object : ValueEventListener{
                     override fun onDataChange(snapshot: DataSnapshot) {
                         var data : Boolean = isValueAvailable(snapshot, code)
-                        Handler().postDelayed({
+                        Handler(Looper.getMainLooper()).postDelayed({
                             if (data==true){
                                 codeFound = true
                                 accepted()
