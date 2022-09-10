@@ -9,10 +9,8 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.FirebaseDatabase
 
 class RegistrationActivity : AppCompatActivity() {
-    private var mAuth: FirebaseAuth? = null
     private var email: EditText? = null
     private  var username:EditText? = null
     private  var password:EditText? = null
@@ -23,17 +21,17 @@ class RegistrationActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
 
-        mAuth = FirebaseAuth.getInstance()
+        register = findViewById(R.id.register)
 
-        register = findViewById<View>(R.id.register) as Button
+        email = findViewById(R.id.email)
+        username = findViewById(R.id.username)
+        password = findViewById(R.id.password)
 
-        email = findViewById<View>(R.id.email) as EditText
-        username = findViewById<View>(R.id.username) as EditText
-        password = findViewById<View>(R.id.password) as EditText
+        progressBar = findViewById(R.id.progressBar)
 
-        progressBar = findViewById<View>(R.id.progressBar) as ProgressBar
-
-        register?.setOnClickListener(View.OnClickListener { userRegistration() })
+        register?.setOnClickListener {
+            userRegistration()
+        }
     }
 
     private fun userRegistration() {
@@ -66,14 +64,13 @@ class RegistrationActivity : AppCompatActivity() {
             return
         }
         progressBar!!.visibility = View.VISIBLE
-        mAuth!!.createUserWithEmailAndPassword(emailString, passwordString)
+        firebaseAuth.createUserWithEmailAndPassword(emailString, passwordString)
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
-                    val user = User(emailString, usernameString)
-                    FirebaseDatabase.getInstance().getReference("Users")
-                        .child(FirebaseAuth.getInstance().currentUser!!.uid)
-                        .setValue(user).addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
+                    val user = User(emailString, usernameString, wins = 0)
+                    reference.child("Users") .child(FirebaseAuth.getInstance().currentUser!!.uid)
+                        .setValue(user).addOnCompleteListener { task2 ->
+                            if (task2.isSuccessful) {
                                 Toast.makeText(
                                     this@RegistrationActivity,
                                     "User has been registered",

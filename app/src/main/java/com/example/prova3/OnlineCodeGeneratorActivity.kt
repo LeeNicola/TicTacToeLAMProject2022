@@ -14,11 +14,11 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
-var isCodeMaker = true
+var isCodeCreator = true
 var code = "null"
 var codeFound = false
-var checkTemp = true
 var keyValue :String = "null"
+
 class OnlineCodeGeneratorActivity : AppCompatActivity() {
     lateinit var headTV : TextView
     lateinit var codeEdt : EditText
@@ -37,27 +37,8 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
         loadingPB = findViewById(R.id.idPBLoading)
 
         createCodeBtn.setOnClickListener(){
-            //val database = FirebaseDatabase.getInstance()
-            //val myRef = database.getReference("prova-d2515-default-rtdb")
-            //myRef.setValue("Hello, World!")
-            //Toast.makeText(this, "PROVA BIGNO", Toast.LENGTH_LONG).show()
-            //var dbRef = FirebaseDatabase.getInstance().getReference("Employees")
-//
-            //dbRef.child("empId").setValue("employee")
-//
-            //    .addOnCompleteListener {
-//
-            //        Toast.makeText(this, "Data inserted successfully", Toast.LENGTH_LONG).show()
-//
-            //    }.addOnFailureListener { err ->
-//
-            //        Toast.makeText(this, "Error ${err.message}", Toast.LENGTH_LONG).show()
-//
-            //    }
-            //Toast.makeText(this, "MANNAGGIA", Toast.LENGTH_LONG).show()
             code = "null"
             codeFound = false
-            checkTemp = true
             keyValue = "null"
             code = codeEdt.text.toString()
             createCodeBtn.visibility = View.GONE
@@ -66,21 +47,20 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
             codeEdt.visibility = View.GONE
             loadingPB.visibility = View.VISIBLE
             if (code != "null" && code != ""){
-                isCodeMaker = true
-                FirebaseDatabase.getInstance().reference.child("codes").addValueEventListener(object : ValueEventListener{
+                isCodeCreator = true
+                reference.child("codes").addValueEventListener(object : ValueEventListener{
                     override fun onDataChange(snapshot: DataSnapshot) {
                         var check = isValueAvailable(snapshot, code)
                         Handler(Looper.getMainLooper()).postDelayed({
-                            if (check==true){
+                            if (check){
                                 createCodeBtn.visibility = View.VISIBLE
                                 joinCodeBtn.visibility = View.VISIBLE
                                 headTV.visibility = View.VISIBLE
                                 codeEdt.visibility = View.VISIBLE
                                 loadingPB.visibility = View.GONE
                             } else {
-                                FirebaseDatabase.getInstance().reference.child("codes").push().setValue(code)
+                                reference.child("codes").push().setValue(code)
                                 isValueAvailable(snapshot, code)
-                                checkTemp = false
                                 Handler(Looper.getMainLooper()).postDelayed({
                                     accepted()
                                     Toast.makeText(this@OnlineCodeGeneratorActivity, "Please don't go back",Toast.LENGTH_SHORT).show()
@@ -106,7 +86,6 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
         joinCodeBtn.setOnClickListener(){
             code = "null"
             codeFound = false
-            checkTemp = true
             keyValue = "null"
             code = codeEdt.text.toString()
             if (code != "null" && code != ""){
@@ -115,12 +94,12 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
                 headTV.visibility = View.GONE
                 codeEdt.visibility = View.GONE
                 loadingPB.visibility = View.VISIBLE
-                isCodeMaker = false
-                FirebaseDatabase.getInstance().reference.child("codes").addValueEventListener(object : ValueEventListener{
+                isCodeCreator = false
+                reference.child("codes").addValueEventListener(object : ValueEventListener{
                     override fun onDataChange(snapshot: DataSnapshot) {
                         var data : Boolean = isValueAvailable(snapshot, code)
                         Handler(Looper.getMainLooper()).postDelayed({
-                            if (data==true){
+                            if (data){
                                 codeFound = true
                                 accepted()
                                 createCodeBtn.visibility = View.VISIBLE
@@ -151,7 +130,7 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
 
     }
 
-    fun accepted(){
+    private fun accepted(){
         startActivity(Intent(this,OnlineMultiPlayerGameActivity::class.java))
         createCodeBtn.visibility = View.VISIBLE
         joinCodeBtn.visibility = View.VISIBLE

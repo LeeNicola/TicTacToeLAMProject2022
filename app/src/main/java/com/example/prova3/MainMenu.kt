@@ -13,6 +13,8 @@ import com.google.firebase.database.*
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
+var nWins : Int = 0
+var userID = user!!.uid
 
 class MainMenu : AppCompatActivity() {
 
@@ -26,10 +28,8 @@ class MainMenu : AppCompatActivity() {
     private lateinit var settings: ImageButton
     private lateinit var logout: Button
     private lateinit var welcomeString : String
-    private var user = Firebase.auth.currentUser
-    private var reference = Firebase.database.reference
-    private var userID = user!!.uid
-    private var firebaseAuth = Firebase.auth
+    private lateinit var winsString: String
+
 
     private val authStateListener = AuthStateListener { firebaseAuth ->
         val firebaseUser = firebaseAuth.currentUser
@@ -54,6 +54,7 @@ class MainMenu : AppCompatActivity() {
         settings = findViewById(R.id.settings)
         logout = findViewById(R.id.logout)
         welcomeString = getString(R.string.welcome)
+        winsString = getString(R.string.wins)
 
 
         startGame.setOnClickListener{
@@ -71,7 +72,9 @@ class MainMenu : AppCompatActivity() {
                 user?.let {
                     val email = profile?.email
                     val username = profile?.username
+                    nWins = profile?.wins!!
                     welcome.text = welcomeString.plus(" ").plus(username)
+                    wins.text = winsString.plus(" ").plus(nWins)
                 }
             }
 

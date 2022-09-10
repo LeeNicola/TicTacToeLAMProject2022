@@ -13,4 +13,5 @@
     <string name="credits">Riconoscimenti</string>
     <string name="logout">Disconnettiti</string>
     <string name="register">Registrati</string>
+    <string name="turn">Turno</string>
 </resources>

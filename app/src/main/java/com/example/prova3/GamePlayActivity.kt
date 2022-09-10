@@ -1,13 +1,11 @@
 package com.example.prova3
 
-import android.content.res.Resources
 import android.graphics.Color
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.provider.Settings.Global.getString
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
@@ -17,27 +15,26 @@ import kotlin.system.exitProcess
 var playerTurn = true
 class GamePlayActivity : AppCompatActivity() {
 
-    lateinit var player1TV : TextView
-    lateinit var player2TV : TextView
-    lateinit var box1Btn : Button
-    lateinit var box2Btn : Button
-    lateinit var box3Btn : Button
-    lateinit var box4Btn : Button
-    lateinit var box5Btn : Button
-    lateinit var box6Btn : Button
-    lateinit var box7Btn : Button
-    lateinit var box8Btn : Button
-    lateinit var box9Btn : Button
-    lateinit var resetBtn : Button
-    var player1count = 0
-    var player2count = 0
-    var player1 = ArrayList<Int>()
-    var player2 = ArrayList<Int>()
-    var emptyCells = ArrayList<Int>()
-    var activeUser = 1
-    lateinit var player1String : String
-    lateinit var player2String : String
-
+    lateinit private var player1TV : TextView
+    lateinit private var player2TV : TextView
+    lateinit private var box1Btn : Button
+    lateinit private var box2Btn : Button
+    lateinit private var box3Btn : Button
+    lateinit private var box4Btn : Button
+    lateinit private var box5Btn : Button
+    lateinit private var box6Btn : Button
+    lateinit private var box7Btn : Button
+    lateinit private var box8Btn : Button
+    lateinit private var box9Btn : Button
+    lateinit private var resetBtn : Button
+    lateinit private var player1String : String
+    lateinit private var player2String : String
+    private var player1count = 0
+    private var player2count = 0
+    private var player1 = ArrayList<Int>()
+    private var player2 = ArrayList<Int>()
+    private var clickedCells = ArrayList<Int>()
+    private var activeUser = 1
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +64,7 @@ class GamePlayActivity : AppCompatActivity() {
     private fun reset() {
         player1.clear()
         player2.clear()
-        emptyCells.clear()
+        clickedCells.clear()
         activeUser = 1
         player1TV.text = player1String.plus(" : ").plus(player1count)
         player2TV.text = player2String.plus(" : ").plus(player2count)
@@ -121,7 +118,7 @@ class GamePlayActivity : AppCompatActivity() {
             buttonSelected.text = "X"
             buttonSelected.setTextColor(Color.parseColor("#EC0C0C"))
             player1.add(currCell)
-            emptyCells.add(currCell)
+            clickedCells.add(currCell)
             buttonSelected.isEnabled = false
             val checkWinner = checkWinner()
             if(checkWinner == 1){
@@ -132,12 +129,12 @@ class GamePlayActivity : AppCompatActivity() {
                 activeUser = 2
             }
         } else {
+            audio.start()
             buttonSelected.text = "O"
             buttonSelected.setTextColor(Color.parseColor("#EC0C0C"))
             activeUser = 1
             player2.add(currCell)
-            emptyCells.add(currCell)
-            audio.start()
+            clickedCells.add(currCell)
             buttonSelected.isEnabled = false
             val checkWinner = checkWinner()
             if(checkWinner == 1){
@@ -148,7 +145,7 @@ class GamePlayActivity : AppCompatActivity() {
 
     private fun robot() {
         val rnd = (1..9).random()
-        if (emptyCells.contains(rnd)){
+        if (clickedCells.contains(rnd)){
             robot()
         } else {
             val buttonSelected = when(rnd){
@@ -165,7 +162,7 @@ class GamePlayActivity : AppCompatActivity() {
                     box1Btn
                 }
             }
-            emptyCells.add(rnd)
+            clickedCells.add(rnd)
             val audio = MediaPlayer.create(this,R.raw.click_sound)
             audio.start()
             buttonSelected.text = "O"
@@ -230,9 +227,9 @@ class GamePlayActivity : AppCompatActivity() {
             build.show()
             return 1
 
-        } else if(emptyCells.contains(1) && emptyCells.contains(2) && emptyCells.contains(3) &&
-                emptyCells.contains(4) && emptyCells.contains(5) && emptyCells.contains(6) &&
-                emptyCells.contains(7) && emptyCells.contains(8) && emptyCells.contains(9)){
+        } else if(clickedCells.contains(1) && clickedCells.contains(2) && clickedCells.contains(3) &&
+                clickedCells.contains(4) && clickedCells.contains(5) && clickedCells.contains(6) &&
+                clickedCells.contains(7) && clickedCells.contains(8) && clickedCells.contains(9)){
             draw_audio.start()
             val build = AlertDialog.Builder(this)
             build.setTitle("Game Over")
