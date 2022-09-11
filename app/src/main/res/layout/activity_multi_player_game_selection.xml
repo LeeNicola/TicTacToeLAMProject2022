@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/light_sea_green"
     tools:context=".MultiPlayerGameSelectionActivity">
 
     <TextView
@@ -14,7 +15,7 @@
         android:layout_marginTop="116dp"
         android:gravity="center"
         android:padding="10dp"
-        android:text="Online or Offline"
+        android:text="@string/game_mode"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="25sp"
@@ -30,7 +31,7 @@
         android:layout_below="@id/idTVHead"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="88dp"
-        android:text="Online Game"
+        android:text="@string/online_game"
         android:textAllCaps="false"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -41,12 +42,24 @@
         android:id="@+id/idBtnOffline"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Offline Game"
+        android:layout_marginTop="32dp"
+        android:text="@string/offline_game"
+        android:textAllCaps="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/idBtnOnline" />
+
+    <Button
+        android:id="@+id/back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/back"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/idBtnOnline"
-        app:layout_constraintVertical_bias="0.254" />
+        app:layout_constraintTop_toBottomOf="@+id/idBtnOffline"
+        app:layout_constraintVertical_bias="0.212" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

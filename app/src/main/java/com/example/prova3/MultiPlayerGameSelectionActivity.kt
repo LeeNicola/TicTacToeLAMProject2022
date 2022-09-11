@@ -7,8 +7,9 @@ import android.widget.Button
 
 class MultiPlayerGameSelectionActivity : AppCompatActivity() {
 
-    lateinit var onlineBtn : Button
-    lateinit var offlineBtn : Button
+    private lateinit var onlineBtn : Button
+    private lateinit var offlineBtn : Button
+    private lateinit var backBtn : Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,7 +18,6 @@ class MultiPlayerGameSelectionActivity : AppCompatActivity() {
         offlineBtn = findViewById(R.id.idBtnOffline)
 
         onlineBtn.setOnClickListener(){
-            singleUser = false
             startActivity(Intent(this, OnlineCodeGeneratorActivity::class.java))
         }
 
@@ -26,5 +26,8 @@ class MultiPlayerGameSelectionActivity : AppCompatActivity() {
             startActivity(Intent(this, GamePlayActivity::class.java))
         }
 
+        backBtn.setOnClickListener(){
+            finish()
+        }
     }
 }

@@ -18,4 +18,40 @@
     <string name="register">Register</string>
     <string name="username" translatable="false">Username</string>
     <string name="turn">Turn</string>
+    <string name="multiplayer">Multiplayer</string>
+    <string name="single_player">Single Player</string>
+    <string name="game_mode">Game Mode</string>
+    <string name="online_game">Online Game</string>
+    <string name="offline_game">Local Mode</string>
+    <string name="settings">settings</string>
+    <string name="join">Join</string>
+    <string name="create">Create</string>
+    <string name="enter_game_code">Enter Game Code</string>
+    <string name="dontGoBack">Please don\'t go back</string>
+    <string name="invalid_code">Invalid Code</string>
+    <string name="dbError">Database Error</string>
+    <string name="enter_valid_code">Please enter a valid code</string>
+    <string name="sec_timer">10 sec timer started</string>
+    <string name="scared">They are too scared to join</string>
+    <string name="opponent_fled">Your opponent has fled</string>
+    <string name="game_over" translatable="false">Game Over</string>
+    <string name="play_again">Start a new game?</string>
+    <string name="draw">It\'s a draw</string>
+    <string name="ok" translatable="false">ok</string>
+    <string name="player2_win">Player 2 Wins</string>
+    <string name="player1_win">Player 1 Wins</string>
+    <string name="error_get_data">Something went wrong getting data</string>
+    <string name="email_req">Email required</string>
+    <string name="inv_email">Email not valid</string>
+    <string name="pwd_req">Password required</string>
+    <string name="inv_pass">Password should be at least 6 characters</string>
+    <string name="success">Success</string>
+    <string name="fail_log">Failed to login</string>
+    <string name="username_req">Username required</string>
+    <string name="reg_success">User has been registered</string>
+    <string name="reg_fail">Failed to register</string>
+    <string name="time_out">Time out</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="author">Nicola Lee</string>
 </resources>

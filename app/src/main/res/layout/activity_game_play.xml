@@ -1,16 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/light_sea_green"
     tools:context=".GamePlayActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:weightSum="3">
+
+        <TextView
+            android:id="@+id/idTVTurn"
+            android:layout_gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_weight="2"
+            android:padding="4dp"
+            android:text="@string/turn"
+            android:textAlignment="center"
+            android:textColor="@color/black" />
+
+        <TextView
+            android:id="@+id/timer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:padding="4dp"
+            android:text=""
+            android:textAlignment="center"
+            android:textColor="@color/black" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="30dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:weightSum="2">
@@ -54,7 +89,8 @@
             android:layout_marginStart="5dp"
             android:background="#FFFFFF"
             android:onClick="buttonClick"
-            android:textSize="60sp" />
+            android:textSize="60sp"
+            tools:ignore="SpeakableTextPresentCheck" />
 
         <Button
             android:id="@+id/idBtnBox2"
@@ -63,7 +99,8 @@
             android:layout_marginStart="5dp"
             android:background="#FFFFFF"
             android:onClick="buttonClick"
-            android:textSize="60sp" />
+            android:textSize="60sp"
+            tools:ignore="SpeakableTextPresentCheck" />
 
         <Button
             android:id="@+id/idBtnBox3"
@@ -72,8 +109,8 @@
             android:layout_marginStart="5dp"
             android:background="#FFFFFF"
             android:onClick="buttonClick"
-            android:textColor="#000000"
-            android:textSize="60sp" />
+            android:textSize="60sp"
+            tools:ignore="SpeakableTextPresentCheck" />
     </TableRow>
 
     <TableRow
@@ -89,8 +126,8 @@
             android:layout_marginTop="5dp"
             android:background="#FFFFFF"
             android:onClick="buttonClick"
-            android:textColor="#000000"
-            android:textSize="60sp" />
+            android:textSize="60sp"
+            tools:ignore="SpeakableTextPresentCheck" />
 
         <Button
             android:id="@+id/idBtnBox5"
@@ -100,8 +137,8 @@
             android:layout_marginTop="5dp"
             android:background="#FFFFFF"
             android:onClick="buttonClick"
-            android:textColor="#000000"
-            android:textSize="60sp" />
+            android:textSize="60sp"
+            tools:ignore="SpeakableTextPresentCheck" />
 
         <Button
             android:id="@+id/idBtnBox6"
@@ -111,8 +148,8 @@
             android:layout_marginTop="5dp"
             android:background="#FFFFFF"
             android:onClick="buttonClick"
-            android:textColor="#000000"
-            android:textSize="60sp" />
+            android:textSize="60sp"
+            tools:ignore="SpeakableTextPresentCheck" />
     </TableRow>
 
     <TableRow
@@ -128,8 +165,8 @@
             android:layout_marginTop="5dp"
             android:background="#FFFFFF"
             android:onClick="buttonClick"
-            android:textColor="#000000"
-            android:textSize="60sp" />
+            android:textSize="60sp"
+            tools:ignore="SpeakableTextPresentCheck" />
 
         <Button
             android:id="@+id/idBtnBox8"
@@ -139,8 +176,8 @@
             android:layout_marginTop="5dp"
             android:background="#FFFFFF"
             android:onClick="buttonClick"
-            android:textColor="#000000"
-            android:textSize="60sp" />
+            android:textSize="60sp"
+            tools:ignore="SpeakableTextPresentCheck" />
 
         <Button
             android:id="@+id/idBtnBox9"
@@ -150,8 +187,8 @@
             android:layout_marginTop="5dp"
             android:background="#FFFFFF"
             android:onClick="buttonClick"
-            android:textColor="#000000"
-            android:textSize="60sp" />
+            android:textSize="60sp"
+            tools:ignore="SpeakableTextPresentCheck" />
 
     </TableRow>
 
@@ -164,6 +201,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/reset" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="15dp"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/back" />
+
     </LinearLayout>
 
 

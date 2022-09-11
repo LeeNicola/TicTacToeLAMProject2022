@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
 import android.view.View
@@ -11,12 +12,15 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlin.system.exitProcess
 
-var isMyTurn = isCodeCreator
+var isMyMove = isCodeMaker
 class OnlineMultiPlayerGameActivity : AppCompatActivity() {
 
     private lateinit var player1TV : TextView
@@ -32,15 +36,24 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
     private lateinit var box9Btn : Button
     private lateinit var resetBtn : Button
     private lateinit var turnTV : TextView
-    private lateinit var player1String : String
     private lateinit var player2String : String
     private lateinit var turnString : String
+    private lateinit var backBtn : Button
+    private lateinit var timerTV : TextView
     private var player1count = 0
     private var player2count = 0
     private var player1 = ArrayList<Int>()
     private var player2 = ArrayList<Int>()
     private var clickedCells = ArrayList<Int>()
-    private var nPlayers = 1
+    private var userID = Firebase.auth.currentUser!!.uid
+    private var reference = Firebase.database.reference
+    private val CODES = "codes"
+    private val DATA = "data"
+    private val SEMICOLON = " : "
+    private val USERS = "Users"
+    private val WINS = "wins"
+    private val X : String = "X"
+    private val O : String = "O"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,41 +71,76 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
         box9Btn = findViewById(R.id.idBtnBox9)
         resetBtn = findViewById(R.id.idBtnReset)
         turnTV = findViewById(R.id.idTVTurn)
-        player1String = getString(R.string.player1)
+        backBtn = findViewById(R.id.back)
+        timerTV = findViewById(R.id.timer)
         player2String = getString(R.string.player2)
         turnString = getString(R.string.turn)
+
+        val loseAudio = MediaPlayer.create(this,R.raw.draw_sound)
+
+
+        val timer = object: CountDownTimer(60000, 1000) {
+
+            override fun onTick(millisUntilFinished: Long) {
+                timerTV.text = (millisUntilFinished / 1000).toString()
+            }
+
+            override fun onFinish() {
+                buttonDisable(300)
+                loseAudio.start()
+                buildAlert(loseAudio, getString(R.string.time_out))
+            }
+        }
+
+
+
+        player1TV.text = playerUsername.plus(SEMICOLON).plus(player1count)
+        player2TV.text = player2String.plus(SEMICOLON).plus(player2count)
+
+        backBtn.setOnClickListener(){
+            finish()
+        }
 
         resetBtn.setOnClickListener {
             reset()
         }
 
-        reference.child("data").child(code).addChildEventListener(object : ChildEventListener{
+        if (nPlayers == 1) {
+            Toast.makeText(this@OnlineMultiPlayerGameActivity, getString(R.string.sec_timer), Toast.LENGTH_SHORT).show()
+            buttonDisable(10000)
+            Handler(Looper.getMainLooper()).postDelayed({ onBackPressed() }, 10000)
+            Handler(Looper.getMainLooper()).postDelayed({ Toast.makeText(this@OnlineMultiPlayerGameActivity, getString(
+                            R.string.scared), Toast.LENGTH_SHORT).show() }, 9999)
+        }
+
+        timer.start()
+
+        reference.child(DATA).child(code).addChildEventListener(object : ChildEventListener{
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 val data = snapshot.value
-                if(isMyTurn){
-                    isMyTurn = false
-                    moveOnline(data.toString(), isMyTurn)
+                if(isMyMove){
+                    isMyMove = false
+                    moveOnline(data.toString(), isMyMove)
                 } else{
-                    isMyTurn = true
-                    moveOnline(data.toString(), isMyTurn)
+                    isMyMove = true
+                    moveOnline(data.toString(), isMyMove)
                 }
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
+                //do nothing
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
                 reset()
-                Toast.makeText(this@OnlineMultiPlayerGameActivity,"Game Reset",Toast.LENGTH_SHORT).show()
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                TODO("Not yet implemented")
+                //do nothing
             }
 
             override fun onCancelled(error: DatabaseError) {
-                TODO("Not yet implemented")
+                Toast.makeText(this@OnlineMultiPlayerGameActivity, getString(R.string.dbError), Toast.LENGTH_SHORT).show()
             }
 
         })
@@ -102,13 +150,11 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
         player1.clear()
         player2.clear()
         clickedCells.clear()
-        nPlayers = 1
-        player1TV.text = player1String.plus(" : ").plus(player1count)
-        player2TV.text = player2String.plus(" : ").plus(player2count)
-        isMyTurn = isCodeCreator
-        if(isCodeCreator){
-            reference.child("data").child(code).removeValue()
-        }
+        player1TV.text = playerUsername.plus(SEMICOLON).plus(player1count)
+        player2TV.text = player2String.plus(SEMICOLON).plus(player2count)
+        turnTV.text = turnString.plus(SEMICOLON).plus(playerUsername)
+        isMyMove = isCodeMaker
+        reference.child(DATA).child(code).removeValue()
         for(i in 1..9){
             val buttonSelected : Button = when(i) {
                 1->box1Btn
@@ -129,7 +175,7 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
         }
     }
 
-    private fun moveOnline(data : String, move : Boolean){
+    fun moveOnline(data : String, move : Boolean){
         val audio = MediaPlayer.create(this, R.raw.click_sound)
         if(move){
             val buttonSelected : Button = when(data.toInt()){
@@ -147,9 +193,9 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
                 }
             }
             audio.start()
-            buttonSelected.text = "0"
-            turnTV.text = turnString.plus(" : ").plus(player1String)
-            buttonSelected.setTextColor(Color.parseColor("#EC0C0C"))
+            buttonSelected.text = O
+            turnTV.text = turnString.plus(SEMICOLON).plus(playerUsername)
+            buttonSelected.setTextColor(Color.parseColor("#FFFFFF"))
             player2.add(data.toInt())
             clickedCells.add(data.toInt())
             buttonSelected.isEnabled = false
@@ -160,9 +206,9 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
     private fun playNow(buttonSelected: Button, currCell: Int) {
         val audio = MediaPlayer.create(this,R.raw.click_sound)
         audio.start()
-        buttonSelected.text = "X"
-        turnTV.text = turnString.plus(" : ").plus(player2String)
-        buttonSelected.setTextColor(Color.parseColor("#EC0C0C"))
+        buttonSelected.text = X
+        turnTV.text = turnString.plus(SEMICOLON).plus(player2String)
+        buttonSelected.setTextColor(Color.parseColor("#FF000000"))
         player1.add(currCell)
         clickedCells.add(currCell)
         buttonSelected.isEnabled = false
@@ -172,102 +218,94 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
 
     private fun checkWinner(): Int {
         val audio = MediaPlayer.create(this,R.raw.victory_sound)
-        val drawAudio = MediaPlayer.create(this,R.raw.draw_sound)
-        if((player1.contains(1) && player1.contains(2) && player1.contains(3)) ||
-            (player1.contains(4) && player1.contains(5) && player1.contains(6)) ||
-            (player1.contains(7) && player1.contains(8) && player1.contains(9)) ||
-            (player1.contains(1) && player1.contains(4) && player1.contains(7)) ||
-            (player1.contains(2) && player1.contains(5) && player1.contains(8)) ||
-            (player1.contains(3) && player1.contains(6) && player1.contains(9)) ||
-            (player1.contains(1) && player1.contains(5) && player1.contains(9)) ||
-            (player1.contains(3) && player1.contains(5) && player1.contains(7))){
+        val loseAudio = MediaPlayer.create(this,R.raw.draw_sound)
+        if(winCondition(player1)){
+            Handler(Looper.getMainLooper()).postDelayed({ reset() }, 300)
             player1count+=1
-            nWins+=player1count
+            nWins+=1
+            reference.child(USERS).child(userID).child(WINS).setValue(nWins)
+            buttonDisable(300)
             audio.start()
-            reference.child("Users").child(userID).child("wins").push().setValue(nWins)
-            val build = AlertDialog.Builder(this)
-            build.setTitle("Game Over")
-            build.setMessage("Player 1 Wins \n\n" + "Do you want to play again?")
-            build.setPositiveButton("ok"){ _,_->
-                reset()
-                audio.release()
-            }
-            build.setNegativeButton("Exit"){ _,_->
-                audio.release()
-                removeCode()
-                exitProcess(1)
-            }
-            build.show()
+            buildAlert(audio, getString(R.string.player1_win))
             return 1
 
-        } else if((player2.contains(1) && player2.contains(2) && player2.contains(3)) ||
-            (player2.contains(4) && player2.contains(5) && player2.contains(6)) ||
-            (player2.contains(7) && player2.contains(8) && player2.contains(9)) ||
-            (player2.contains(1) && player2.contains(4) && player2.contains(7)) ||
-            (player2.contains(2) && player2.contains(5) && player2.contains(8)) ||
-            (player2.contains(3) && player2.contains(6) && player2.contains(9)) ||
-            (player2.contains(1) && player2.contains(5) && player2.contains(9)) ||
-            (player2.contains(3) && player2.contains(5) && player2.contains(7))){
+        } else if(winCondition(player2)){
+            Handler(Looper.getMainLooper()).postDelayed( { reset() }, 300)
             player2count+=1
+            buttonDisable(300)
             audio.start()
-            val build = AlertDialog.Builder(this)
-            build.setTitle("Game Over")
-            build.setMessage("Player 2 Wins \n\n" + "Do you want to play again?")
-            build.setPositiveButton("ok"){ _,_->
-                reset()
-                audio.release()
-            }
-            build.setNegativeButton("Exit"){ _,_->
-                audio.release()
-                removeCode()
-                exitProcess(1)
-            }
-            build.show()
+            buildAlert(loseAudio, getString(R.string.player2_win))
+
             return 1
 
         } else if(clickedCells.contains(1) && clickedCells.contains(2) && clickedCells.contains(3) &&
             clickedCells.contains(4) && clickedCells.contains(5) && clickedCells.contains(6) &&
             clickedCells.contains(7) && clickedCells.contains(8) && clickedCells.contains(9)){
-            drawAudio.start()
-            val build = AlertDialog.Builder(this)
-            build.setTitle("Game Over")
-            build.setMessage("Game Draw \n\n" + "Do you want to play again?")
-            build.setPositiveButton("ok"){ _,_->
-                reset()
-                drawAudio.release()
-            }
-            build.setNegativeButton("Exit"){ _,_->
-                drawAudio.release()
-                removeCode()
-                exitProcess(1)
-            }
-            Handler(Looper.getMainLooper()).postDelayed(Runnable { build.show() }, 2000)
+            Handler(Looper.getMainLooper()).postDelayed( { reset() }, 300)
+            buttonDisable(300)
+            loseAudio.start()
+            buildAlert(loseAudio, getString(R.string.draw))
             return 1
         }
         return 0
 
     }
 
-    private fun removeCode(){
-        if (isCodeCreator){
-            reference.child("codes").child(keyValue).removeValue()
+    private fun winCondition(player : ArrayList<Int>): Boolean {
+        if((player.contains(1) && player.contains(2) && player.contains(3)) ||
+                (player.contains(4) && player.contains(5) && player.contains(6)) ||
+                (player.contains(7) && player.contains(8) && player.contains(9)) ||
+                (player.contains(1) && player.contains(4) && player.contains(7)) ||
+                (player.contains(2) && player.contains(5) && player.contains(8)) ||
+                (player.contains(3) && player.contains(6) && player.contains(9)) ||
+                (player.contains(1) && player.contains(5) && player.contains(9)) ||
+                (player.contains(3) && player.contains(5) && player.contains(7))) {
+            return true
         }
+        return false
+    }
+
+    private fun buildAlert(audio : MediaPlayer, alertMessage : String){
+        val build = AlertDialog.Builder(this)
+        build.setTitle(getString(R.string.game_over))
+        build.setMessage(alertMessage +" \n\n" + getString(R.string.play_again))
+        build.setPositiveButton(getString(R.string.ok)){ _,_->
+            isCodeInvalid()
+            reset()
+            audio.release()
+        }
+        build.setNegativeButton(getString(R.string.exit)){ _,_->
+            audio.release()
+            removeCode()
+            exitProcess(1)
+        }
+        Handler(Looper.getMainLooper()).postDelayed( { build.show() }, 2000)
+    }
+
+    private fun isCodeInvalid(){
+        if (isCodeInvalid) {
+            finish()
+            Toast.makeText(this@OnlineMultiPlayerGameActivity, getString(R.string.opponent_fled), Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun removeCode(){
+        reference.child(CODES).child(keyValue).removeValue()
+        reference.child(DATA).child(code).removeValue()
     }
 
     private fun updateDatabase(cellID : Int){
-        reference.child("data").child(code).push().setValue(cellID)
+        reference.child(DATA).child(code).push().setValue(cellID)
     }
+
 
     override fun onBackPressed() {
         removeCode()
-        if (isCodeCreator){
-            reference.child("data").child(code).removeValue()
-        }
         exitProcess(0)
     }
 
     fun buttonClick(view: View) {
-        if(isMyTurn){
+        if(isMyMove){
             val but = view as Button
             val cellOnline: Int  = when (but.id) {
                 R.id.idBtnBox1 -> 1
@@ -284,9 +322,35 @@ class OnlineMultiPlayerGameActivity : AppCompatActivity() {
                 }
             }
             playerTurn = false
-            Handler(Looper.getMainLooper()).postDelayed(Runnable { playerTurn = true }, 800)
+            Handler(Looper.getMainLooper()).postDelayed({ playerTurn = true }, 800)
             playNow(but, cellOnline)
             updateDatabase(cellOnline)
+        }
+    }
+
+    private fun buttonDisable(time : Long) {
+        resetBtn.isEnabled = false
+        backBtn.isEnabled = false
+        Handler(Looper.getMainLooper()).postDelayed({ resetBtn.isEnabled = true }, time)
+        Handler(Looper.getMainLooper()).postDelayed({ backBtn.isEnabled = true }, time)
+        for (i in 1..9){
+            val buttonSelected : Button = when(i){
+                1->box1Btn
+                2->box2Btn
+                3->box3Btn
+                4->box4Btn
+                5->box5Btn
+                6->box6Btn
+                7->box7Btn
+                8->box8Btn
+                9->box9Btn
+                else->{
+                    box1Btn
+                }
+            }
+            if (buttonSelected.isEnabled){
+                buttonSelected.isEnabled = false
+            }
         }
     }
 }

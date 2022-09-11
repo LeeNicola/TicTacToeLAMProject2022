@@ -4,37 +4,51 @@ import android.graphics.Color
 import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlin.system.exitProcess
 
 var playerTurn = true
 class GamePlayActivity : AppCompatActivity() {
 
-    lateinit private var player1TV : TextView
-    lateinit private var player2TV : TextView
-    lateinit private var box1Btn : Button
-    lateinit private var box2Btn : Button
-    lateinit private var box3Btn : Button
-    lateinit private var box4Btn : Button
-    lateinit private var box5Btn : Button
-    lateinit private var box6Btn : Button
-    lateinit private var box7Btn : Button
-    lateinit private var box8Btn : Button
-    lateinit private var box9Btn : Button
-    lateinit private var resetBtn : Button
-    lateinit private var player1String : String
-    lateinit private var player2String : String
+    private lateinit var player1TV : TextView
+    private lateinit var player2TV : TextView
+    private lateinit var box1Btn : Button
+    private lateinit var box2Btn : Button
+    private lateinit var box3Btn : Button
+    private lateinit var box4Btn : Button
+    private lateinit var box5Btn : Button
+    private lateinit var box6Btn : Button
+    private lateinit var box7Btn : Button
+    private lateinit var box8Btn : Button
+    private lateinit var box9Btn : Button
+    private lateinit var resetBtn : Button
+    private lateinit var turnTV : TextView
+    private lateinit var player2String : String
+    private lateinit var turnString : String
+    private lateinit var backBtn : Button
+    private lateinit var timerTV : TextView
     private var player1count = 0
     private var player2count = 0
     private var player1 = ArrayList<Int>()
     private var player2 = ArrayList<Int>()
     private var clickedCells = ArrayList<Int>()
     private var activeUser = 1
+    private var userID = Firebase.auth.currentUser!!.uid
+    private var reference = Firebase.database.reference
+    private val SEMICOLON = " : "
+    private val USERS = "Users"
+    private val WINS = "wins"
+    private val X : String = "X"
+    private val O : String = "O"
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,11 +67,38 @@ class GamePlayActivity : AppCompatActivity() {
         box8Btn = findViewById(R.id.idBtnBox8)
         box9Btn = findViewById(R.id.idBtnBox9)
         resetBtn = findViewById(R.id.idBtnReset)
-        player1String = getString(R.string.player1)
+        backBtn = findViewById(R.id.back)
+        turnTV = findViewById(R.id.idTVTurn)
+        timerTV = findViewById(R.id.timer)
         player2String = getString(R.string.player2)
+        turnString = getString(R.string.turn)
+        val loseAudio = MediaPlayer.create(this,R.raw.draw_sound)
+
+
+        val timer = object: CountDownTimer(60000, 1000) {
+
+            override fun onTick(millisUntilFinished: Long) {
+                timerTV.text = (millisUntilFinished / 1000).toString()
+            }
+
+            override fun onFinish() {
+                buttonDisable()
+                loseAudio.start()
+                buildAlert(loseAudio, getString(R.string.time_out))
+            }
+        }
+
+        timer.start()
+        turnTV.text = turnString.plus(SEMICOLON).plus(playerUsername)
+        player1TV.text = playerUsername.plus(SEMICOLON).plus(player1count)
+        player2TV.text = player2String.plus(SEMICOLON).plus(player2count)
 
         resetBtn.setOnClickListener{
             reset()
+        }
+
+        backBtn.setOnClickListener{
+            finish()
         }
     }
 
@@ -65,9 +106,10 @@ class GamePlayActivity : AppCompatActivity() {
         player1.clear()
         player2.clear()
         clickedCells.clear()
+        turnTV.text = turnString.plus(SEMICOLON).plus(playerUsername)
         activeUser = 1
-        player1TV.text = player1String.plus(" : ").plus(player1count)
-        player2TV.text = player2String.plus(" : ").plus(player2count)
+        player1TV.text = playerUsername.plus(SEMICOLON).plus(player1count)
+        player2TV.text = player2String.plus(SEMICOLON).plus(player2count)
         playerTurn = true
         for(i in 1..9){
             val buttonSelected : Button  = when(i) {
@@ -105,7 +147,7 @@ class GamePlayActivity : AppCompatActivity() {
                 R.id.idBtnBox9 -> cellID = 9
             }
             playerTurn = false
-            Handler(Looper.getMainLooper()).postDelayed(Runnable { playerTurn = true }, 800)
+            Handler(Looper.getMainLooper()).postDelayed( { playerTurn = true }, 800)
             playNow(but, cellID)
         }
 
@@ -115,38 +157,40 @@ class GamePlayActivity : AppCompatActivity() {
         val audio = MediaPlayer.create(this,R.raw.click_sound)
         if(activeUser == 1){
             audio.start()
-            buttonSelected.text = "X"
-            buttonSelected.setTextColor(Color.parseColor("#EC0C0C"))
+            buttonSelected.text = X
+            turnTV.text = turnString.plus(SEMICOLON).plus(player2String)
+            buttonSelected.setTextColor(Color.parseColor("#FF000000"))
             player1.add(currCell)
             clickedCells.add(currCell)
             buttonSelected.isEnabled = false
             val checkWinner = checkWinner()
             if(checkWinner == 1){
-                Handler(Looper.getMainLooper()).postDelayed(Runnable { reset()}, 800)
+                Handler(Looper.getMainLooper()).postDelayed( { reset()}, 1000)
             } else if (singleUser){
-                Handler(Looper.getMainLooper()).postDelayed(Runnable { robot()}, 800)
+                Handler(Looper.getMainLooper()).postDelayed( { ia()}, 800)
             } else {
                 activeUser = 2
             }
         } else {
             audio.start()
-            buttonSelected.text = "O"
-            buttonSelected.setTextColor(Color.parseColor("#EC0C0C"))
+            buttonSelected.text = O
+            turnTV.text = turnString.plus(SEMICOLON).plus(playerUsername)
+            buttonSelected.setTextColor(Color.parseColor("#FFFFFF"))
             activeUser = 1
             player2.add(currCell)
             clickedCells.add(currCell)
             buttonSelected.isEnabled = false
             val checkWinner = checkWinner()
             if(checkWinner == 1){
-                Handler(Looper.getMainLooper()).postDelayed(Runnable { reset() }, 800)
+                Handler(Looper.getMainLooper()).postDelayed( { reset() }, 800)
             }
         }
     }
 
-    private fun robot() {
+    private fun ia() {
         val rnd = (1..9).random()
         if (clickedCells.contains(rnd)){
-            robot()
+            ia()
         } else {
             val buttonSelected = when(rnd){
                 1->box1Btn
@@ -165,86 +209,101 @@ class GamePlayActivity : AppCompatActivity() {
             clickedCells.add(rnd)
             val audio = MediaPlayer.create(this,R.raw.click_sound)
             audio.start()
-            buttonSelected.text = "O"
-            buttonSelected.setTextColor(Color.parseColor("#EC0C0C"))
+            buttonSelected.text = O
+            turnTV.text = turnString.plus(SEMICOLON).plus(playerUsername)
+            buttonSelected.setTextColor(Color.parseColor("#FFFFFF"))
             player2.add(rnd)
             buttonSelected.isEnabled = false
             val checkWinner = checkWinner()
             if(checkWinner==1){
-                Handler(Looper.getMainLooper()).postDelayed(Runnable { reset() }, 800)
+                Handler(Looper.getMainLooper()).postDelayed( { reset() }, 800)
             }
         }
     }
 
     private fun checkWinner(): Int {
         val audio = MediaPlayer.create(this,R.raw.victory_sound)
-        val draw_audio = MediaPlayer.create(this,R.raw.draw_sound)
-        if((player1.contains(1) && player1.contains(2) && player1.contains(3)) ||
-            (player1.contains(4) && player1.contains(5) && player1.contains(6)) ||
-            (player1.contains(7) && player1.contains(8) && player1.contains(9)) ||
-            (player1.contains(1) && player1.contains(4) && player1.contains(7)) ||
-            (player1.contains(2) && player1.contains(5) && player1.contains(8)) ||
-            (player1.contains(3) && player1.contains(6) && player1.contains(9)) ||
-            (player1.contains(1) && player1.contains(5) && player1.contains(9)) ||
-            (player1.contains(3) && player1.contains(5) && player1.contains(7))){
+        val loseAudio = MediaPlayer.create(this,R.raw.draw_sound)
+        if(winCondition(player1)){
+            Handler(Looper.getMainLooper()).postDelayed({ reset() }, 300)
             player1count+=1
+            nWins+=1
+            reference.child(USERS).child(userID).child(WINS).setValue(nWins)
+            buttonDisable()
             audio.start()
-            val build = AlertDialog.Builder(this)
-            build.setTitle("Game Over")
-            build.setMessage("Player 1 Wins \n\n" + "Do you want to play again?")
-            build.setPositiveButton("ok"){ _,_->
-                reset()
-                audio.release()
-            }
-            build.setNegativeButton("Exit"){ _,_->
-                audio.release()
-                exitProcess(1)
-            }
-            build.show()
+            buildAlert(audio, getString(R.string.player1_win))
             return 1
 
-        } else if((player2.contains(1) && player2.contains(2) && player2.contains(3)) ||
-            (player2.contains(4) && player2.contains(5) && player2.contains(6)) ||
-            (player2.contains(7) && player2.contains(8) && player2.contains(9)) ||
-            (player2.contains(1) && player2.contains(4) && player2.contains(7)) ||
-            (player2.contains(2) && player2.contains(5) && player2.contains(8)) ||
-            (player2.contains(3) && player2.contains(6) && player2.contains(9)) ||
-            (player2.contains(1) && player2.contains(5) && player2.contains(9)) ||
-            (player2.contains(3) && player2.contains(5) && player2.contains(7))){
+        } else if(winCondition(player2)){
             player2count+=1
-            audio.start()
-            val build = AlertDialog.Builder(this)
-            build.setTitle("Game Over")
-            build.setMessage("Player 2 Wins \n\n" + "Do you want to play again?")
-            build.setPositiveButton("ok"){ _,_->
-                reset()
-                audio.release()
-            }
-            build.setNegativeButton("Exit"){ _,_->
-                audio.release()
-                exitProcess(1)
-            }
-            build.show()
+            buttonDisable()
+            loseAudio.start()
+            buildAlert(loseAudio, getString(R.string.player2_win))
             return 1
 
         } else if(clickedCells.contains(1) && clickedCells.contains(2) && clickedCells.contains(3) &&
                 clickedCells.contains(4) && clickedCells.contains(5) && clickedCells.contains(6) &&
                 clickedCells.contains(7) && clickedCells.contains(8) && clickedCells.contains(9)){
-            draw_audio.start()
-            val build = AlertDialog.Builder(this)
-            build.setTitle("Game Over")
-            build.setMessage("Game Draw \n\n" + "Do you want to play again?")
-            build.setPositiveButton("ok"){ _,_->
-                reset()
-                draw_audio.release()
-            }
-            build.setNegativeButton("Exit"){ _,_->
-                draw_audio.release()
-                exitProcess(1)
-            }
-            build.show()
+            buttonDisable()
+            loseAudio.start()
+            buildAlert(loseAudio, getString(R.string.draw))
             return 1
         }
         return 0
+    }
+
+    private fun winCondition(player : ArrayList<Int>): Boolean {
+        if((player.contains(1) && player.contains(2) && player.contains(3)) ||
+            (player.contains(4) && player.contains(5) && player.contains(6)) ||
+            (player.contains(7) && player.contains(8) && player.contains(9)) ||
+            (player.contains(1) && player.contains(4) && player.contains(7)) ||
+            (player.contains(2) && player.contains(5) && player.contains(8)) ||
+            (player.contains(3) && player.contains(6) && player.contains(9)) ||
+            (player.contains(1) && player.contains(5) && player.contains(9)) ||
+            (player.contains(3) && player.contains(5) && player.contains(7))) {
+            return true
+        }
+        return false
+    }
+
+    private fun buildAlert(audio : MediaPlayer, alertMessage : String){
+        val build = AlertDialog.Builder(this)
+        build.setTitle(getString(R.string.game_over))
+        build.setMessage(alertMessage +" \n\n" + getString(R.string.play_again))
+        build.setPositiveButton(getString(R.string.ok)){ _,_->
+            reset()
+            audio.release()
+        }
+        build.setNegativeButton(getString(R.string.exit)){ _,_->
+            audio.release()
+            exitProcess(1)
+        }
+        Handler(Looper.getMainLooper()).postDelayed( { build.show() }, 700)
+    }
+
+    private fun buttonDisable() {
+        resetBtn.isEnabled = false
+        backBtn.isEnabled = false
+        Handler(Looper.getMainLooper()).postDelayed({ resetBtn.isEnabled = true }, 1000)
+        Handler(Looper.getMainLooper()).postDelayed({ backBtn.isEnabled = true }, 1000)
+        for (i in 1..9){
+            val buttonSelected : Button = when(i){
+                1->box1Btn
+                2->box2Btn
+                3->box3Btn
+                4->box4Btn
+                5->box5Btn
+                6->box6Btn
+                7->box7Btn
+                8->box8Btn
+                9->box9Btn
+                else->{
+                    box1Btn
+                }
+            }
+            if (buttonSelected.isEnabled){
+                buttonSelected.isEnabled = false
+            }
+        }
     }
 }

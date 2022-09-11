@@ -9,23 +9,26 @@ import android.view.View
 import android.widget.*
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
-var isCodeCreator = true
+var isCodeMaker = true
 var code = "null"
 var codeFound = false
 var keyValue :String = "null"
+var isCodeInvalid = false
+var nPlayers = 1
 
 class OnlineCodeGeneratorActivity : AppCompatActivity() {
-    lateinit var headTV : TextView
-    lateinit var codeEdt : EditText
-    lateinit var createCodeBtn : Button
-    lateinit var joinCodeBtn : Button
-    lateinit var loadingPB : ProgressBar
-
+    private lateinit var headTV : TextView
+    private lateinit var codeEdt : EditText
+    private lateinit var createCodeBtn : Button
+    private lateinit var joinCodeBtn : Button
+    private lateinit var loadingPB : ProgressBar
+    private lateinit var backBtn : Button
+    private var reference = Firebase.database.reference
+    private val CODES = "codes"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,96 +38,79 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
         createCodeBtn = findViewById(R.id.idBtnCreate)
         joinCodeBtn = findViewById(R.id.idBtnJoin)
         loadingPB = findViewById(R.id.idPBLoading)
+        backBtn = findViewById(R.id.back)
 
-        createCodeBtn.setOnClickListener(){
+        backBtn.setOnClickListener(){
+            finish()
+        }
+
+        createCodeBtn.setOnClickListener {
             code = "null"
             codeFound = false
             keyValue = "null"
             code = codeEdt.text.toString()
-            createCodeBtn.visibility = View.GONE
-            joinCodeBtn.visibility = View.GONE
-            headTV.visibility = View.GONE
-            codeEdt.visibility = View.GONE
-            loadingPB.visibility = View.VISIBLE
+            itemsVisibility(false)
             if (code != "null" && code != ""){
-                isCodeCreator = true
+                isCodeMaker = true
                 reference.child("codes").addValueEventListener(object : ValueEventListener{
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        var check = isValueAvailable(snapshot, code)
+                        val check = isValueAvailable(snapshot, code)
                         Handler(Looper.getMainLooper()).postDelayed({
                             if (check){
-                                createCodeBtn.visibility = View.VISIBLE
-                                joinCodeBtn.visibility = View.VISIBLE
-                                headTV.visibility = View.VISIBLE
-                                codeEdt.visibility = View.VISIBLE
-                                loadingPB.visibility = View.GONE
+                                itemsVisibility(true)
                             } else {
-                                reference.child("codes").push().setValue(code)
+                                reference.child(CODES).push().setValue(code)
                                 isValueAvailable(snapshot, code)
                                 Handler(Looper.getMainLooper()).postDelayed({
                                     accepted()
-                                    Toast.makeText(this@OnlineCodeGeneratorActivity, "Please don't go back",Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this@OnlineCodeGeneratorActivity, getString(R.string.dontGoBack),Toast.LENGTH_SHORT).show()
                                 },300)
                             }
                         },2000)
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        throw error.toException();
+                        throw error.toException()
                     }
                 })
             } else {
-                createCodeBtn.visibility = View.VISIBLE
-                joinCodeBtn.visibility = View.VISIBLE
-                headTV.visibility = View.VISIBLE
-                codeEdt.visibility = View.VISIBLE
-                loadingPB.visibility = View.GONE
-                Toast.makeText(this,"Please enter a valid code",Toast.LENGTH_SHORT).show()
+                itemsVisibility(true)
+                Toast.makeText(this,getString(R.string.enter_valid_code),Toast.LENGTH_SHORT).show()
             }
         }
 
-        joinCodeBtn.setOnClickListener(){
+        joinCodeBtn.setOnClickListener{
             code = "null"
             codeFound = false
             keyValue = "null"
             code = codeEdt.text.toString()
             if (code != "null" && code != ""){
-                createCodeBtn.visibility = View.GONE
-                joinCodeBtn.visibility = View.GONE
-                headTV.visibility = View.GONE
-                codeEdt.visibility = View.GONE
-                loadingPB.visibility = View.VISIBLE
-                isCodeCreator = false
-                reference.child("codes").addValueEventListener(object : ValueEventListener{
+                itemsVisibility(false)
+                isCodeMaker = false
+                reference.child(CODES).addValueEventListener(object : ValueEventListener{
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        var data : Boolean = isValueAvailable(snapshot, code)
+                        val data : Boolean = isValueAvailable(snapshot, code)
                         Handler(Looper.getMainLooper()).postDelayed({
                             if (data){
                                 codeFound = true
+                                nPlayers = 2
                                 accepted()
-                                createCodeBtn.visibility = View.VISIBLE
-                                joinCodeBtn.visibility = View.VISIBLE
-                                headTV.visibility = View.VISIBLE
-                                codeEdt.visibility = View.VISIBLE
-                                loadingPB.visibility = View.GONE
+                                itemsVisibility(true)
                             } else{
-                                createCodeBtn.visibility = View.VISIBLE
-                                joinCodeBtn.visibility = View.VISIBLE
-                                headTV.visibility = View.VISIBLE
-                                codeEdt.visibility = View.VISIBLE
-                                loadingPB.visibility = View.GONE
-                                Toast.makeText(this@OnlineCodeGeneratorActivity, "Invalid Code",Toast.LENGTH_SHORT).show()
+                                itemsVisibility(true)
+                                isCodeInvalid = true
+                                Toast.makeText(this@OnlineCodeGeneratorActivity, getString(R.string.invalid_code),Toast.LENGTH_SHORT).show()
                             }
                         },200)
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        //
+                        Toast.makeText(this@OnlineCodeGeneratorActivity, getString(R.string.dbError),Toast.LENGTH_SHORT).show()
                     }
                 })
 
             } else {
-                Toast.makeText(this,"Please enter a valid code",Toast.LENGTH_SHORT).show()
+                Toast.makeText(this,getString(R.string.enter_valid_code),Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -132,22 +118,34 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
 
     private fun accepted(){
         startActivity(Intent(this,OnlineMultiPlayerGameActivity::class.java))
-        createCodeBtn.visibility = View.VISIBLE
-        joinCodeBtn.visibility = View.VISIBLE
-        codeEdt.visibility = View.VISIBLE
-        headTV.visibility = View.VISIBLE
-        loadingPB.visibility = View.GONE
+        itemsVisibility(true)
     }
 
     fun isValueAvailable(snapshot: DataSnapshot, code : String): Boolean{
-        var data = snapshot.children
+        val data = snapshot.children
         data.forEach{
-            var value = it.getValue().toString()
+            val value = it.value.toString()
             if(value==code){
                 keyValue = it.key.toString()
                 return true
             }
         }
         return false
+    }
+
+    private fun itemsVisibility(boolean: Boolean){
+        if (boolean){
+            createCodeBtn.visibility = View.VISIBLE
+            joinCodeBtn.visibility = View.VISIBLE
+            codeEdt.visibility = View.VISIBLE
+            headTV.visibility = View.VISIBLE
+            loadingPB.visibility = View.GONE
+        } else {
+            createCodeBtn.visibility = View.GONE
+            joinCodeBtn.visibility = View.GONE
+            headTV.visibility = View.GONE
+            codeEdt.visibility = View.GONE
+            loadingPB.visibility = View.VISIBLE
+        }
     }
 }
