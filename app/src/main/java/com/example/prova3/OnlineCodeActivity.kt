@@ -7,6 +7,8 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.widget.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -17,10 +19,8 @@ var isCodeMaker = true
 var code = "null"
 var codeFound = false
 var keyValue :String = "null"
-var isCodeInvalid = false
-var nPlayers = 1
 
-class OnlineCodeGeneratorActivity : AppCompatActivity() {
+class OnlineCodeActivity : AppCompatActivity() {
     private lateinit var headTV : TextView
     private lateinit var codeEdt : EditText
     private lateinit var createCodeBtn : Button
@@ -29,6 +29,15 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
     private lateinit var backBtn : Button
     private var reference = Firebase.database.reference
     private val CODES = "codes"
+    private var firebaseAuth = Firebase.auth
+
+    private val authStateListener = FirebaseAuth.AuthStateListener { firebaseAuth ->
+        val firebaseUser = firebaseAuth.currentUser
+        if (firebaseUser == null) {
+            val intent = Intent(this@OnlineCodeActivity, MainMenuActivity::class.java)
+            startActivity(intent)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +61,7 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
             itemsVisibility(false)
             if (code != "null" && code != ""){
                 isCodeMaker = true
-                reference.child("codes").addValueEventListener(object : ValueEventListener{
+                reference.child(CODES).addValueEventListener(object : ValueEventListener{
                     override fun onDataChange(snapshot: DataSnapshot) {
                         val check = isValueAvailable(snapshot, code)
                         Handler(Looper.getMainLooper()).postDelayed({
@@ -63,7 +72,8 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
                                 isValueAvailable(snapshot, code)
                                 Handler(Looper.getMainLooper()).postDelayed({
                                     accepted()
-                                    Toast.makeText(this@OnlineCodeGeneratorActivity, getString(R.string.dontGoBack),Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(this@OnlineCodeActivity, getString(R.string.dontGoBack),Toast.LENGTH_SHORT).show()
+                                    finish()
                                 },300)
                             }
                         },2000)
@@ -74,8 +84,8 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
                     }
                 })
             } else {
-                itemsVisibility(true)
                 Toast.makeText(this,getString(R.string.enter_valid_code),Toast.LENGTH_SHORT).show()
+                itemsVisibility(true)
             }
         }
 
@@ -84,8 +94,8 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
             codeFound = false
             keyValue = "null"
             code = codeEdt.text.toString()
+            itemsVisibility(false)
             if (code != "null" && code != ""){
-                itemsVisibility(false)
                 isCodeMaker = false
                 reference.child(CODES).addValueEventListener(object : ValueEventListener{
                     override fun onDataChange(snapshot: DataSnapshot) {
@@ -93,23 +103,22 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
                         Handler(Looper.getMainLooper()).postDelayed({
                             if (data){
                                 codeFound = true
-                                nPlayers = 2
                                 accepted()
                                 itemsVisibility(true)
                             } else{
+                                Toast.makeText(this@OnlineCodeActivity, getString(R.string.invalid_code),Toast.LENGTH_SHORT).show()
                                 itemsVisibility(true)
-                                isCodeInvalid = true
-                                Toast.makeText(this@OnlineCodeGeneratorActivity, getString(R.string.invalid_code),Toast.LENGTH_SHORT).show()
                             }
                         },200)
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        Toast.makeText(this@OnlineCodeGeneratorActivity, getString(R.string.dbError),Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@OnlineCodeActivity, getString(R.string.dbError),Toast.LENGTH_SHORT).show()
                     }
                 })
 
             } else {
+                itemsVisibility(true)
                 Toast.makeText(this,getString(R.string.enter_valid_code),Toast.LENGTH_SHORT).show()
             }
         }
@@ -117,7 +126,7 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
     }
 
     private fun accepted(){
-        startActivity(Intent(this,OnlineMultiPlayerGameActivity::class.java))
+        startActivity(Intent(this,OnlineGameActivity::class.java))
         itemsVisibility(true)
     }
 
@@ -147,5 +156,15 @@ class OnlineCodeGeneratorActivity : AppCompatActivity() {
             codeEdt.visibility = View.GONE
             loadingPB.visibility = View.VISIBLE
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        firebaseAuth.addAuthStateListener(authStateListener)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        firebaseAuth.removeAuthStateListener(authStateListener)
     }
 }

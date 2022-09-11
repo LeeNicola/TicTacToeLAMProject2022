@@ -24,7 +24,7 @@ class LoginActivity : AppCompatActivity() {
     private val authStateListener = AuthStateListener {
         val firebaseUser = Firebase.auth.currentUser
         if (firebaseUser != null) {
-            val intent = Intent(this@LoginActivity, MainMenu::class.java)
+            val intent = Intent(this@LoginActivity, MainMenuActivity::class.java)
             startActivity(intent)
             finish()
         }
@@ -94,7 +94,7 @@ class LoginActivity : AppCompatActivity() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Toast.makeText(this@LoginActivity, getString(R.string.success), Toast.LENGTH_SHORT).show()
-                    mainMenuPage()
+                    toMenuPage()
                 } else {
                     Toast.makeText(this@LoginActivity, getString(R.string.fail_log), Toast.LENGTH_SHORT).show()
                     itemsVisibility(true)
@@ -108,9 +108,9 @@ class LoginActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun mainMenuPage(){
-        val toMainMenu = Intent(this, MainMenu::class.java)
-        startActivity(toMainMenu)
+    private fun toMenuPage(){
+        val toMainMenuActivity = Intent(this, MainMenuActivity::class.java)
+        startActivity(toMainMenuActivity)
         finish()
     }
 

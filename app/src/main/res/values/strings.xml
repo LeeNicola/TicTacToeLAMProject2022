@@ -37,7 +37,7 @@
     <string name="game_over" translatable="false">Game Over</string>
     <string name="play_again">Start a new game?</string>
     <string name="draw">It\'s a draw</string>
-    <string name="ok" translatable="false">ok</string>
+    <string name="ok" translatable="false">OK</string>
     <string name="player2_win">Player 2 Wins</string>
     <string name="player1_win">Player 1 Wins</string>
     <string name="error_get_data">Something went wrong getting data</string>
@@ -52,6 +52,15 @@
     <string name="reg_fail">Failed to register</string>
     <string name="time_out">Time out</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="author">Nicola Lee</string>
+    <string name="rules_2">You are X, the enemy is O. Players take turns putting their marks in empty squares.</string>
+    <string name="rules_1">The game is played on a grid 3x3 squares.</string>
+    <string name="rules_3">The first player to get 3 of her marks in a row (up, down, across, or diagonally) is the winner.</string>
+    <string name="rules_4">When all 9 squares are full, the game is over. If no player has 3 marks in a row, the game ends in a tie.</string>
+    <string name="example">Example</string>
+    <string name="rules_5">Online Mode:</string>
+    <string name="rules_6">Create a code and share it with your friend</string>
+    <string name="rules_7">If none joins in 10 s, the lobby will disappear and it will be needed a new code</string>
+    <string name="rules_8">Maximum duration of every game is 1 min</string>
+    <string name="rulesHead">Rules:</string>
+    <string name="play">Let\'s play</string>
 </resources>

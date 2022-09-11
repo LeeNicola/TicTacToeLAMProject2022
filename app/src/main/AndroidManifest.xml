@@ -17,33 +17,28 @@
         android:theme="@style/Theme.Prova3"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".RulesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".MainMenuActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".MainMenu"
+            android:name=".OnlineGameActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
-            android:name=".OnlineMultiPlayerGameActivity"
+            android:name=".OnlineCodeActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
-            android:name=".OnlineCodeGeneratorActivity"
+            android:name=".OfflineGameActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".MultiPlayerGameSelectionActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"/>
-        <activity
-            android:name=".GamePlayActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".RegistrationActivity"
             android:exported="false"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".LoginActivity"
             android:exported="true"

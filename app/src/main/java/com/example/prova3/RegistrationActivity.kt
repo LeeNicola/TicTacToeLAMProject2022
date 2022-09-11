@@ -76,7 +76,7 @@ class RegistrationActivity : AppCompatActivity() {
             .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     val user = User(emailString, usernameString, wins = 0)
-                    reference.child(USERS) .child(FirebaseAuth.getInstance().currentUser!!.uid)
+                    reference.child(USERS).child(firebaseAuth.currentUser!!.uid)
                         .setValue(user).addOnCompleteListener { task2 ->
                             if (task2.isSuccessful) {
                                 Toast.makeText(

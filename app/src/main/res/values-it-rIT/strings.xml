@@ -45,4 +45,15 @@
     <string name="reg_success">Utente registrato con successo</string>
     <string name="reg_fail">Registrazione non riuscito</string>
     <string name="time_out">Tempo scaduto</string>
+    <string name="rules_1">Si gioca su una griglia 3x3.</string>
+    <string name="rules_2">Voi siete X, l\'avversario O. A turni, i giocatori occupano una cella vuota con il suo simbolo.</string>
+    <string name="rules_3">Il primo giocatore che a occupare 3 celle consecutive (verticale, orizzontale o diagonale) vince.</string>
+    <string name="rules_4">Quando tutte le 9 caselle vengono occupate, il gioco termina. Se nessun giocatore ha fatto tris, il gioco termina in parità.</string>
+    <string name="rules_6">Crea un codice e condividilo con il tuo amico</string>
+    <string name="rules_7">Se entro 10 s nessuno si unisce, la lobby scomparirà e servirà un nuovo codice</string>
+    <string name="example">Esempio</string>
+    <string name="rules_5">Modalità Online:</string>
+    <string name="rules_8">Durata massima di una partita è di 1 min</string>
+    <string name="rulesHead">Regole:</string>
+    <string name="play">Iniziamo</string>
 </resources>
